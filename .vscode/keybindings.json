@@ -1,0 +1,21 @@
+[
+    {
+        "key": "ctrl+alt+t",
+        "command": "command-runner.run",
+        "args": {
+            "command": "oj test"
+        }
+    },
+    {
+        "key": "ctrl+alt+s",
+        "command": "command-runner.run",
+        "args": {
+            "command": "acc submit"
+        }
+    },
+    {
+        "key": "ctrl+alt+b",
+        "command": "workbench.action.tasks.build",
+        "when": "taskCommandsRegistered"
+    }
+]
