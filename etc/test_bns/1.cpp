@@ -225,6 +225,10 @@ class Triangle3d : public Plane3d {
 
     Point3d get_circumcenter();
     Vec3d get_radius_vec();
+
+    Point3d get_a();
+    Point3d get_b();
+    Point3d get_c();
 };
 
 Triangle3d::Triangle3d() {}
@@ -260,6 +264,9 @@ Triangle3d::~Triangle3d() {}
 
 Point3d Triangle3d::get_circumcenter() { return p; }
 Vec3d Triangle3d::get_radius_vec() { return p - a; }
+Point3d Triangle3d::get_a() { return a; }
+Point3d Triangle3d::get_b() { return b; }
+Point3d Triangle3d::get_c() { return c; }
 
 //! @brief 三次元空間上の球
 class Sphere3d {
@@ -382,30 +389,76 @@ int main() {
     for (int i = 0; i < n; ++i) {
         Triangle3d t = tris.at(i);
 
-        // nを球の中心,oを円の中心,pを平面上の点とする
-        Vec3d np, no;
+        Vec3d vec_ap = s.get_center() - t.get_a();
+        Vec3d vec_bp = s.get_center() - t.get_b();
+        Vec3d vec_cp = s.get_center() - t.get_c();
 
-        np = t.p - s.get_center();
-        no = t.n.dot(t.p - s.get_center()) * t.n;
+        Vec3d vec_ab = t.get_b() - t.get_a();
+        Vec3d vec_bc = t.get_c() - t.get_b();
+        Vec3d vec_ca = t.get_b() - t.get_a();
 
-        float l, r;
-        if (no.length() == 0) {
-            // 三角形の外心と交わるならば衝突しているはず
-            l = Vec3d(s.get_center() - t.get_circumcenter()).length();
-            r = s.get_radius();
-
-        } else {
-            // 三角形と同一平面上の円
-            Circle3d c(s.get_center() + no, Vec3d(np.cross(no)).length() /
-                                                (np.length() * no.length()));
-
-            // 三角形の外心と交わるならば衝突しているはず
-            l = Vec3d(c.get_center() - t.get_circumcenter()).length();
-            r = c.get_radius();
+        if (Vec3d(vec_ab.cross(vec_ap)).length() / vec_ab.length() <=
+            s.get_radius()) {
+            if (vec_ab.dot(vec_ap) * vec_ab.dot(vec_bp) <= 0) {
+                answer++;
+                continue;
+            } else if (s.get_radius() > vec_ap.length() ||
+                       s.get_radius() > vec_bp.length()) {
+                answer++;
+                continue;
+            }
         }
-        if (l <= r + t.get_radius_vec().length() &&
-            l >= r - t.get_radius_vec().length())
-            answer++;
+
+        if (Vec3d(vec_bc.cross(vec_bp)).length() / vec_bc.length() <=
+            s.get_radius()) {
+            if (vec_bc.dot(vec_bp) * vec_bc.dot(vec_cp) <= 0) {
+                answer++;
+                continue;
+            } else if (s.get_radius() > vec_bp.length() ||
+                       s.get_radius() > vec_cp.length()) {
+                answer++;
+                continue;
+            }
+        }
+
+        if (Vec3d(vec_ca.cross(vec_ap)).length() / vec_ca.length() <=
+            s.get_radius()) {
+            if (vec_ca.dot(vec_cp) * vec_ca.dot(vec_ap) <= 0) {
+                answer++;
+                continue;
+            } else if (s.get_radius() > vec_cp.length() ||
+                       s.get_radius() > vec_ap.length()) {
+                answer++;
+                continue;
+            }
+        }
+
+        // // nを球の中心,oを円の中心,pを平面上の点とする
+        // Vec3d np, no;
+
+        // np = t.p - s.get_center();
+        // no = t.n.dot(t.p - s.get_center()) * t.n;
+
+        // float l, r;
+        // if (no.length() == 0) {
+        //     // 三角形の外心と交わるならば衝突しているはず
+        //     l = Vec3d(s.get_center() - t.get_circumcenter()).length();
+        //     r = s.get_radius();
+
+        // } else {
+        //     // 三角形と同一平面上の円
+        //     Circle3d c(s.get_center() + no, Vec3d(np.cross(no)).length()
+        //     /
+        //                                         (np.length() *
+        //                                         no.length()));
+
+        //     // 三角形の外心と交わるならば衝突しているはず
+        //     l = Vec3d(c.get_center() - t.get_circumcenter()).length();
+        //     r = c.get_radius();
+        // }
+        // if (l <= r + t.get_radius_vec().length() &&
+        //     l >= r - t.get_radius_vec().length())
+        //     answer++;
     }
 
     cout << answer << endl;
